@@ -28,8 +28,21 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+import re
+import urllib2
+from os.path import basename, join, exists
+
 def downloadnew(todir):
-    pass
+    url = "http://www.rockbox.org/irc/"
+    data = urllib2.urlopen(url).read()
+    for loglink in re.findall(r'log-\d{8}', data):
+        log = "http://www.rockbox.org/irc/rockbox-%s.txt" % loglink.replace('log-', '')
+        target = join(todir, basename(log))
+        if not exists(target):
+            print "Getting %s" % target
+            f = open(target, 'w')
+            f.write(urllib2.urlopen(url).read())
+            f.close()
 
 def getactivity(fromdir):
     pass
