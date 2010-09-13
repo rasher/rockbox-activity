@@ -48,14 +48,12 @@ def staff():
 
 def login(user, passwrd):
     global OPENER
-    opener = None
     if OPENER == None:
         url = "http://forums.rockbox.org/index.php?action=login2"
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor)
         formdata = {'passwrd':passwrd, 'hash_passwd':'', 'user':user}
         opener.open(url, urllib.urlencode(formdata)).read()
         OPENER = opener
-    return OPENER
 
 
 def userposts(userid):
@@ -72,7 +70,7 @@ def userposts(userid):
     central = pytz.timezone('US/Central')
     while True:
         url = urlf % (int(userid), start)
-        data = opener.open(url).read()
+        data = OPENER.open(url).read()
 
         for date in [datetime(*map(int, m.groups())) for m in dates.finditer(data)]:
             date = central.localize(date).astimezone(pytz.utc)
@@ -91,10 +89,14 @@ if __name__ == "__main__":
     import sys
     names = staff()
     user = 'Rockbox'
-    if user not in names:
-        print "Something's wrong: %s is not in staff" % user
+    if len(sys.argv) < 3:
+        print sys.stderr, "Usage: %s user password" % sys.argv[0]
         sys.exit(1)
+    login(sys.argv[1], sys.argv[2])
+    if user not in names:
+        print sys.stderr, "Something's wrong: %s is not in staff" % user
+        sys.exit(2)
     posts = userposts(names[user])
     if len(posts) < 1:
-        print "Something's wrong: No posts found for %s" % user
-        sys.exit(2)
+        print >> sys.stderr, "Something's wrong: No posts found for %s" % user
+        sys.exit(3)
