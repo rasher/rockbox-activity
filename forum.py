@@ -87,14 +87,14 @@ def userposts(userid):
 
 if __name__ == "__main__":
     import sys
-    names = staff()
     user = 'Rockbox'
     if len(sys.argv) < 3:
-        print sys.stderr, "Usage: %s user password" % sys.argv[0]
+        print >> sys.stderr, "Usage: %s user password" % sys.argv[0]
         sys.exit(1)
+    names = staff()
     login(sys.argv[1], sys.argv[2])
     if user not in names:
-        print sys.stderr, "Something's wrong: %s is not in staff" % user
+        print >> sys.stderr, "Something's wrong: %s is not in staff" % user
         sys.exit(2)
     posts = userposts(names[user])
     if len(posts) < 1:
