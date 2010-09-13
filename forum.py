@@ -54,9 +54,9 @@ def login(user, passwrd):
         formdata = {'passwrd':passwrd, 'hash_passwd':'', 'user':user}
         data = opener.open(url, urllib.urlencode(formdata)).read()
         if 'That username does not exist.' in data:
-                raise Exception("Wrong username: %s" % user)
-            elif 'Password incorrect' in data:
-                raise Exception("Incorrect password for user %s" % user)
+            raise Exception("Wrong username: %s" % user)
+        elif 'Password incorrect' in data:
+            raise Exception("Incorrect password for user %s" % user)
         OPENER = opener
 
 
@@ -88,6 +88,16 @@ def userposts(userid):
             break
     return posts
 
+def getactivity(users):
+    stafflist = staff()
+    activity = {}
+    for user in users:
+        for nick in users[user]['forum']:
+            if nick in stafflist:
+                if user not in activity:
+                    activity[user] = []
+                activity[user] += userposts(stafflist[nick])
+    return activity
 
 if __name__ == "__main__":
     import sys
