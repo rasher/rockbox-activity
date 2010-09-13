@@ -52,7 +52,11 @@ def login(user, passwrd):
         url = "http://forums.rockbox.org/index.php?action=login2"
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor)
         formdata = {'passwrd':passwrd, 'hash_passwd':'', 'user':user}
-        opener.open(url, urllib.urlencode(formdata)).read()
+        data = opener.open(url, urllib.urlencode(formdata)).read()
+        if 'That username does not exist.' in data:
+                raise Exception("Wrong username: %s" % user)
+            elif 'Password incorrect' in data:
+                raise Exception("Incorrect password for user %s" % user)
         OPENER = opener
 
 
