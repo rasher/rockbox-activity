@@ -51,7 +51,6 @@ def update(mldir):
         source = "http://www.rockbox.org/mail/%s" % archive
         target = join(mldir, basename(archive) + '.html')
         if not exists(target):
-            print "%s -> %s" % (source, target)
             f = open(target, 'w')
             f.write(urllib2.urlopen(source).read())
             f.close()
