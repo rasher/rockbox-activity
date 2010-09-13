@@ -29,7 +29,10 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import re
+import pytz
 import urllib2
+from glob import iglob
+from datetime import datetime
 from os.path import basename, join, exists
 
 def downloadnew(todir):
@@ -41,11 +44,41 @@ def downloadnew(todir):
         if not exists(target):
             print "Getting %s" % target
             f = open(target, 'w')
-            f.write(urllib2.urlopen(url).read())
+            f.write(urllib2.urlopen(log).read())
             f.close()
 
-def getactivity(fromdir):
-    pass
+def getactivity(fromdir, userlist):
+    l = re.compile(r'^(?P<h>\d\d)\.(?P<m>\d\d).(?P<s>\d\d) \#\s*<(?P<nick>[^>]*)>')
+    activity = {}
+    sweden = pytz.timezone('Europe/Stockholm')
+    for logfile in iglob("%s/rockbox-*.txt" % fromdir):
+        logdate = [int(logfile[-12:-8]), int(logfile[-8:-6]), int(logfile[-6:-4])]
+        for line in open(logfile).readlines():
+            m = l.match(line)
+            if m:
+                for user in userlist:
+                    for nickused in userlist[user]['irc']:
+                        save = False
+                        try:
+                            if nickused.match(m.group('nick')):
+                                save = True
+                        except AttributeError as e:
+                            if nickused == m.group('nick'):
+                                save = True
+                        if save:
+                            if user not in activity:
+                                activity[user] = []
+                            time = datetime(*logdate + map(int, m.group('h','m','s')))
+                            time = sweden.localize(time).astimezone(pytz.utc)
+                            activity[user].append(time)
+    return activity
 
 if __name__ == "__main__":
-    pass
+    users = {
+            'Jonas Häggqvist': {
+                'irc': [re.compile(r'(?i)rasher.*')],
+                    },
+                }
+    activity = getactivity('irclogs', users)
+    for user in activity:
+        print "%s: %d" % (user, len(activity[user]))
