@@ -40,6 +40,7 @@ def config(v):
 if __name__ == "__main__":
     mldir = 'ml'
     irclogs = 'irclogs'
+    svnrevs = 'svnrevs'
     ml.update(mldir)
     irc.update(irclogs)
     forum.login(config('forumuser'), config('forumpass'))
@@ -47,7 +48,7 @@ if __name__ == "__main__":
     activity = {
             'ml': ml.getactivity(mldir, people),
             'IRC' : irc.getactivity(irclogs, people),
-            'SVN' : svn.getactivity(people),
+            'SVN' : svn.getactivity(svnrevs, people),
             'Forum': forum.getactivity(people),
     }
     units = {
