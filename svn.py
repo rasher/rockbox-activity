@@ -30,9 +30,17 @@
 
 import pytz
 import pysvn
+from os.path import exists
 from datetime import datetime
 
-def getactivity(userlist):
+def readrevs(svnfile):
+    revs = []
+    if exists(svnfile):
+        for line in open(svnfile).readlines():
+            revs.append(line.strip().split(":"))
+    return revs
+
+def getactivity(svnfile, userlist):
     activity = {}
     client = pysvn.Client()
     repo = 'svn://svn.rockbox.org/rockbox/trunk'
@@ -40,21 +48,37 @@ def getactivity(userlist):
     for realname in userlist:
         for nick in userlist[realname]['svn']:
             namemap[nick] = realname
-    for rev in client.log(repo):
-        if not rev.has_key('author') or rev.author not in namemap:
+
+    revs = readrevs(svnfile)
+    if len(revs) > 0:
+        fromrev = pysvn.Revision(pysvn.opt_revision_kind.number, revs[-1][0])
+    else:
+        fromrev = pysvn.Revision(pysvn.opt_revision_kind.number, 0)
+    savedrevs = open(svnfile, 'a')
+    logs = client.log(repo, revision_end=fromrev)
+    logs.reverse()
+    for rev in logs:
+        if rev.has_key('author') and rev.has_key('date') and rev.has_key('revision') and rev.revision.number > fromrev.number:
+            revs.append((rev.revision.number, rev.date, rev.author))
+            line = "%s:%f:%s\n" % (rev.revision.number, rev.date, rev.author)
+            savedrevs.write(line)
+
+    for rev, timestamp, author in revs:
+        if author not in namemap:
             continue
-        realname = namemap[rev.author]
+        realname = namemap[author]
         if realname not in activity:
             activity[realname] = []
-        activity[realname].append(pytz.utc.localize(datetime.utcfromtimestamp(rev.date)))
+        activity[realname].append(pytz.utc.localize(datetime.utcfromtimestamp(float(timestamp))))
     return activity
 
 if __name__ == "__main__":
     users = {
             'Jonas Häggqvist': {
-                'svn': ['rasher'],
+                'svn': ['rasher', 'Buschel', 'buschel'],
                     },
                 }
-    activity = getactivity(users)
+    svnfile = 'svnrevs'
+    activity = getactivity(svnfile, users)
     for user in activity:
         print "%s: %d" % (user, len(activity[user]))
