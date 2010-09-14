@@ -1,0 +1,5 @@
+forumuser:user
+forumpass:pass
+irclogs:./irclogs
+ml:./ml
+svnrevs:./svnrevs

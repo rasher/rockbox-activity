@@ -37,25 +37,29 @@ def config(v):
     c = dict([x.split(':') for x in open('config').readlines()])
     return c[v].strip()
 
-if __name__ == "__main__":
-    mldir = 'ml'
-    irclogs = 'irclogs'
-    svnrevs = 'svnrevs'
+def collect():
+    mldir = config('mldir')
+    irclogs = config('irclogs')
+    svnrevs = config('svnrevs')
     ml.update(mldir)
     irc.update(irclogs)
     forum.login(config('forumuser'), config('forumpass'))
-    
     activity = {
             'ml': ml.getactivity(mldir, people),
-            'IRC' : irc.getactivity(irclogs, people),
-            'SVN' : svn.getactivity(svnrevs, people),
-            'Forum': forum.getactivity(people),
+            'irc': irc.getactivity(irclogs, people),
+            'svn': svn.getactivity(svnrevs, people),
+            'forum': forum.getactivity(people),
     }
+    return activity
+    
+
+if __name__ == "__main__":
+    activity = collect()
     units = {
             'ml':'mail',
-            'IRC':'line',
-            'SVN':'commit',
-            'Forum':'post',
+            'irc':'line',
+            'svn':'commit',
+            'forum':'post',
             }
     for user in people:
         print user
