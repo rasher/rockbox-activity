@@ -61,6 +61,8 @@ def getactivity(mldir, userlist):
     search = re.compile(r'(?i)<em>\s*(?P<author>[^<]*?)\s*</em>.*?<em>\((?P<y>\d{4})-(?P<m>\d{2})-(?P<d>\d{2})\)</em>')
     sweden = pytz.timezone('Europe/Stockholm')
     for user in userlist:
+        if 'ml' not in userlist[user]:
+            continue
         for usedname in userlist[user]['ml']:
             namemap[usedname] = user
     for month in glob(mldir + '/*.html'):

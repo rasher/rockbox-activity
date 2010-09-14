@@ -92,6 +92,8 @@ def getactivity(users):
     stafflist = staff()
     activity = {}
     for user in users:
+        if 'forum' not in users[user]:
+            continue
         for nick in users[user]['forum']:
             if nick in stafflist:
                 if user not in activity:

@@ -46,6 +46,8 @@ def getactivity(svnfile, userlist):
     repo = 'svn://svn.rockbox.org/rockbox/trunk'
     namemap = {}
     for realname in userlist:
+        if 'svn' not in userlist[realname]:
+            continue
         for nick in userlist[realname]['svn']:
             namemap[nick] = realname
 

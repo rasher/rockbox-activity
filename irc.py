@@ -56,6 +56,8 @@ def getactivity(fromdir, userlist):
             m = l.match(line)
             if m:
                 for user in userlist:
+                    if 'irc' not in userlist[user]:
+                        continue
                     for nickused in userlist[user]['irc']:
                         save = False
                         try:
