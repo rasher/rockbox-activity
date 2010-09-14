@@ -27,42 +27,26 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-from people import people
-import forum
-import irc
-import svn
-import ml
+import re
 
-def config(v):
-    c = dict([x.split(':') for x in open('config').readlines()])
-    return c[v].strip()
+people = {
+        u'Jonas Häggqvist': {
+            'ml': [u'Jonas Häggqvist', 'Jonas H'],
+            'irc': ['rasher', 'rasher_', re.compile('(?i)rasher.*'), re.compile('(?i)bacon_.*')],
+            'svn': ['rasher'],
+            'forum': ['rasher'],
+            },
+        }
+
+def checkpeople():
+    global people
+    import urllib2
+    url = "http://svn.rockbox.org/viewvc.cgi/trunk/docs/COMMITTERS"
+    for line in urllib2.urlopen(url).readlines():
+        committer, realname = line.decode('cp1252').strip().split(" ", 1)
+        if realname in people:
+            if 'svn' not in people[realname] or committer not in people[realname]['svn']:
+                print "Add %s to %s" % (committer, realname)
 
 if __name__ == "__main__":
-    mldir = 'ml'
-    irclogs = 'irclogs'
-    ml.update(mldir)
-    irc.update(irclogs)
-    forum.login(config('forumuser'), config('forumpass'))
-    
-    activity = {
-            'ml': ml.getactivity(mldir, people),
-            'IRC' : irc.getactivity(irclogs, people),
-            'SVN' : svn.getactivity(people),
-            'Forum': forum.getactivity(people),
-    }
-    units = {
-            'ml':'mail',
-            'IRC':'line',
-            'SVN':'commit',
-            'Forum':'post',
-            }
-    for user in people:
-        print user
-        for loc in activity:
-            if user in activity[loc]:
-                count = len(activity[loc][user])
-                unit = units[loc]
-                s = "s"
-                if unit == 1:
-                    s = ""
-                print "  %s%s %s%s" % (loc.ljust(7, '.'), str(count).rjust(7, '.'), unit, s)
+    checkpeople()
