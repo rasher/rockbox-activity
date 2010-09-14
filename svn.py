@@ -75,7 +75,7 @@ def getactivity(svnfile, userlist):
 if __name__ == "__main__":
     users = {
             'Jonas Häggqvist': {
-                'svn': ['rasher', 'Buschel', 'buschel'],
+                'svn': ['rasher'],
                     },
                 }
     svnfile = 'svnrevs'
