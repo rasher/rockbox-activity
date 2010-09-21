@@ -72,6 +72,7 @@ def getactivity(fromdir, userlist):
                             time = datetime(*logdate + map(int, m.group('h','m','s')))
                             time = sweden.localize(time).astimezone(pytz.utc)
                             activity[user].append(time)
+                            break
     return activity
 
 if __name__ == "__main__":
