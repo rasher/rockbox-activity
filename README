@@ -1,1 +1,16 @@
+ABOUT
 
+Collect activity data for Rockbox developers (or other users) and potentially
+produce graphs of it.
+
+
+REQUIREMENTS
+
+python-svn
+python-matplotlib
+
+
+GETTING STARTED
+
+Copy the file config.example to config, and edit it to include a valid login
+for forums.rockbox.org.
