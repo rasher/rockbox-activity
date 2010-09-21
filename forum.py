@@ -33,7 +33,6 @@ import pytz
 import urllib
 import urllib2
 import cookielib
-from pprint import pprint
 from datetime import datetime
 
 OPENER = None
