@@ -94,10 +94,15 @@ def getactivity(users):
         if 'forum' not in users[user]:
             continue
         for nick in users[user]['forum']:
-            if nick in stafflist:
-                if user not in activity:
-                    activity[user] = []
-                activity[user] += userposts(stafflist[nick])
+            if nick.isdigit():
+                userid=nick
+            elif nick in stafflist:
+                userid=stafflist[nick]
+            else:
+                continue
+            if user not in activity:
+                activity[user] = []
+            activity[user] += userposts(stafflist[nick])
     return activity
 
 if __name__ == "__main__":
