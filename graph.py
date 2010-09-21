@@ -66,19 +66,24 @@ def rolling_average(data, count):
         output.append((point, float(sum(last))/count))
     return output
 
-def render(output, width, height, *args):
-    plotargs = []
-    for arg in args:
-        plotargs.append([x[0] for x in arg[0]])
-        plotargs.append([y[1] for y in arg[0]])
-        plotargs.append(arg[1])
-    plt.plot(*plotargs)
-    plt.ylabel('lines/week')
-    plt.savefig(output)
-    pass
+def xy(data):
+    return ([x[0] for x in data],[y[1] for y in data])
 
 if __name__ == "__main__":
     activity = collect()
-    data = compress_data(activity['irc'][u'Jonas Häggqvist'], pytz.utc.localize(datetime(2005, 1, 1)), timedelta(days=7))
-    rlavg = rolling_average(data, 10)
-    render('sparkline-7d-10wk-avg-rasher.png', 400, 300, (data,'b'), (rlavg, 'r'))
+    for where in activity:
+        print where
+        for who in activity[where]:
+            print "  %s" % who
+            print "    compress data"
+            data = compress_data(activity[where][who], pytz.utc.localize(datetime(2002, 1, 1)), timedelta(days=31))
+            print "    generate rolling average"
+            rlavg = rolling_average(data, 3)
+            print "    plot data"
+            plt.bar(*xy(data), width=[datetime.min+timedelta(days=30)]*len(data))
+            print "    plot rolling average"
+            plt.plot(*xy(rlavg), color='red')
+            filename = '%s-%s-2002-1m-3m-avg.png' % (where, who.encode('ascii','xmlcharrefreplace'))
+            print "    save to %s" % filename
+            plt.savefig(filename, transparent=True, bbox_inches='tight')
+            plt.close()
