@@ -1,5 +1,5 @@
 forumuser:user
 forumpass:pass
 irclogs:./irclogs
-ml:./ml
+mldir:./ml
 svnrevs:./svnrevs
